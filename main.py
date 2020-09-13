@@ -14,49 +14,53 @@
 если городов не осталдось, то пользователь выйграл
 """
 
-cache = set()
-# вот тут есть куча варинтов развания собыйти.
-cities = {x.strip().lower().replace('ё', 'е') for x in open("cities.txt", "r").readlines() if x.strip()}
-wrong_char = ("Ъ", "ь", "ы", "й")
-char = None
+check_list = []
 
-while True:
-    user_say = input(f"[{char or 'any'}] Start:").strip().lower()
-    # пользователь назвал город не с той буквы
-    if char and char != user_say[0]:
+
+def normilize_city_name(name):
+    return name.strip().lower().replace('ё', 'е')
+
+
+def proverka(fun):
+    check_list.append(fun)
+    return fun
+
+
+@proverka
+def is_startswith_true(city, char, **kwargs):
+    if char is None or city.startswith(char):
+        return True
+    else:
         print(f'Город должен начинаться с буквы {char}.')
-        continue
-    # пользователь назвал уже озвученный город
-    if user_say in cache:
+        return False
+
+
+@proverka
+def is_non_cached(city, cache, **kwargs):
+    if city not in cache:
+        return True
+    else:
         print("Этот город уже был назван.")
-        continue
-    # такого города нет в списке известных
-    if user_say not in cities:
+        return False
+
+
+@proverka
+def is_alwailable(city, cities, **kwargs):
+    if city in cities:
+        return True
+    else:
         print("Я такого города не знаю.")
-        continue
-    # убираем из списка доступных
-    cities.remove(user_say)
-    # перекидываем город в кэш
-    cache.add(user_say)
-    # выбираем букву для следующего города
-    for char in user_say[::-1]:
-        if char in wrong_char:
-            continue
-        else:
-            break
-    else:
-        raise RuntimeError
-    # выбираем город
-    for city in cities:
-        if city.startswith(char):
-            break
-    else:
-        raise Exception("Вы победили!")
+        return False
+
+
+def move_to_cache(city, cities, cache):
     # убираем из списка доступных
     cities.remove(city)
     # перекидываем город в кэш
     cache.add(city)
-    print(city)
+
+
+def get_next_char(city):
     # выбираем букву для следующего города
     for char in city[::-1]:
         if char in wrong_char:
@@ -65,3 +69,32 @@ while True:
             break
     else:
         raise RuntimeError
+    return char
+
+
+def main():
+    char = None
+    while True:
+        user_say = input(f"[{char or 'any'}] Start:")
+        next_city = normilize_city_name(user_say)
+        if not all(x(next_city, char=char, cache=cache, cities=cities) for x in check_list):
+            continue
+        move_to_cache(next_city, cities, cache)
+        char = get_next_char(next_city)
+        # выбираем город
+        for city in cities:
+            if city.startswith(char):
+                break
+        else:
+            raise Exception("Вы победили!")
+        move_to_cache(city, cities, cache)
+        print(city)
+        char = get_next_char(city)
+
+
+if __name__ == '__main__':
+    cache = set()
+    # вот тут есть куча варинтов развания собыйти.
+    cities = {normilize_city_name(x) for x in open("cities.txt", "r").readlines() if x.strip()}
+    wrong_char = ("Ъ", "ь", "ы", "й")
+    main()
