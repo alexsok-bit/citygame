@@ -61,6 +61,7 @@ def move_to_cache(city, cities, cache):
 
 
 def get_next_char(city):
+    wrong_char = ("Ъ", "ь", "ы", "й")
     # выбираем букву для следующего города
     for char in city[::-1]:
         if char in wrong_char:
@@ -96,5 +97,4 @@ if __name__ == '__main__':
     cache = set()
     # вот тут есть куча варинтов развания собыйти.
     cities = {normilize_city_name(x) for x in open("cities.txt", "r").readlines() if x.strip()}
-    wrong_char = ("Ъ", "ь", "ы", "й")
     main()
