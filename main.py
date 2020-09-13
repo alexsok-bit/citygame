@@ -18,17 +18,17 @@ from itertools import cycle
 check_list = []
 
 
-def normilize_city_name(name):
+def normalize_city_name(name):
     return name.strip().lower().replace('ё', 'е')
 
 
-def proverka(fun):
+def check_point(fun):
     check_list.append(fun)
     return fun
 
 
-@proverka
-def is_startswith_true(city, char, **kwargs):
+@check_point
+def is_city_startswith_char(city, char, **kwargs):
     if char is None or city.startswith(char):
         return True
     else:
@@ -36,7 +36,7 @@ def is_startswith_true(city, char, **kwargs):
         return False
 
 
-@proverka
+@check_point
 def is_non_cached(city, cache, **kwargs):
     if city not in cache:
         return True
@@ -45,8 +45,8 @@ def is_non_cached(city, cache, **kwargs):
         return False
 
 
-@proverka
-def is_alwailable(city, cities, **kwargs):
+@check_point
+def is_available(city, cities, **kwargs):
     if city in cities:
         return True
     else:
@@ -76,10 +76,11 @@ def get_next_char(city):
 
 def user_point(char):
     user_say = input(f"[{char or 'any'}] Start:")
-    next_city = normilize_city_name(user_say)
-    if not all(x(next_city, char=char, cache=cache, cities=cities) for x in check_list):
+    city = normalize_city_name(user_say)
+    kw = {"char": char, "cache": cache, "cities": cities}
+    if not all(x(city, **kw) for x in check_list):
         return user_point(char)
-    return next_city
+    return city
 
 
 def ai_point(char):
@@ -104,5 +105,5 @@ def main():
 if __name__ == '__main__':
     cache = set()
     # вот тут есть куча варинтов развания собыйти.
-    cities = {normilize_city_name(x) for x in open("cities.txt", "r").readlines() if x.strip()}
+    cities = {normalize_city_name(x) for x in open("cities.txt", "r").readlines() if x.strip()}
     main()
