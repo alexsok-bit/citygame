@@ -13,6 +13,7 @@
 выводим на экран
 если городов не осталдось, то пользователь выйграл
 """
+from itertools import cycle
 
 check_list = []
 
@@ -31,7 +32,7 @@ def is_startswith_true(city, char, **kwargs):
     if char is None or city.startswith(char):
         return True
     else:
-        print(f'Город должен начинаться с буквы {char}.')
+        print(f'Город должен начинаться с буквы {char.capitalize()}.')
         return False
 
 
@@ -73,24 +74,31 @@ def get_next_char(city):
     return char
 
 
+def user_point(char):
+    user_say = input(f"[{char or 'any'}] Start:")
+    next_city = normilize_city_name(user_say)
+    if not all(x(next_city, char=char, cache=cache, cities=cities) for x in check_list):
+        return user_point(char)
+    return next_city
+
+
+def ai_point(char):
+    # выбираем город
+    for city in cities:
+        if city.startswith(char):
+            break
+    else:
+        raise SystemExit("Вы победили!")
+    print(city)
+    return city
+
+
 def main():
     char = None
-    while True:
-        user_say = input(f"[{char or 'any'}] Start:")
-        next_city = normilize_city_name(user_say)
-        if not all(x(next_city, char=char, cache=cache, cities=cities) for x in check_list):
-            continue
+    for point in cycle((user_point, ai_point)):
+        next_city = point(char)
         move_to_cache(next_city, cities, cache)
         char = get_next_char(next_city)
-        # выбираем город
-        for city in cities:
-            if city.startswith(char):
-                break
-        else:
-            raise Exception("Вы победили!")
-        move_to_cache(city, cities, cache)
-        print(city)
-        char = get_next_char(city)
 
 
 if __name__ == '__main__':
