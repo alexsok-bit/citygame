@@ -21,18 +21,18 @@ wrong_char = ("Ъ", "ь", "ы", "й")
 char = None
 
 while True:
-    user_say = input(f"[{char}] Start:").strip().lower()
+    user_say = input(f"[{char or 'any'}] Start:").strip().lower()
     # пользователь назвал город не с той буквы
     if char and char != user_say[0]:
-        print('Wrong citi')
+        print(f'Город должен начинаться с буквы {char}.')
         continue
     # пользователь назвал уже озвученный город
     if user_say in cache:
-        print("Already said")
+        print("Этот город уже был назван.")
         continue
     # такого города нет в списке известных
     if user_say not in cities:
-        print("Unknown city. Try again")
+        print("Я такого города не знаю.")
         continue
     # убираем из списка доступных
     cities.remove(user_say)
@@ -51,7 +51,7 @@ while True:
         if city.startswith(char):
             break
     else:
-        raise Exception("user win")
+        raise Exception("Вы победили!")
     # убираем из списка доступных
     cities.remove(city)
     # перекидываем город в кэш
