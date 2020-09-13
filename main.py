@@ -16,7 +16,7 @@
 
 cache = set()
 # вот тут есть куча варинтов развания собыйти.
-cities = {x.strip().replace('ё', 'е').lower() for x in open("cities.txt", "r").readlines() if x.strip()}
+cities = {x.strip().lower().replace('ё', 'е') for x in open("cities.txt", "r").readlines() if x.strip()}
 wrong_char = ("Ъ", "ь", "ы", "й")
 char = None
 
