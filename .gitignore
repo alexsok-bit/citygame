@@ -1,6 +1,7 @@
 .idea/
 *.html
 *.txt
+!requirements.txt
 
 # Created by .ignore support plugin (hsz.mobi)
 __pycache__/
