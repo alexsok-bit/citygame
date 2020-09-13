@@ -16,20 +16,30 @@
 
 cache = set()
 # вот тут есть куча варинтов развания собыйти.
-cities = {x.strip().lower() for x in open("cities.txt", "r").readlines() if x.strip()}
+cities = {x.strip().replace('ё', 'е').lower() for x in open("cities.txt", "r").readlines() if x.strip()}
 wrong_char = ("Ъ", "ь", "ы", "й")
+char = None
 
 while True:
     user_say = input("Start:").strip().lower()
-    if user_say not in cities and user_say not in cache:
-        print("Wrong city. Try again")
+    # пользователь назван город не с той буквы
+    if char and char != user_say[0]:
+        print('Wrong citi')
+        continue
+    # пользователь назвал уже озвученный город
+    if user_say in cache:
+        print("Already said")
+        continue
+    # такого города нет в списке известных
+    if user_say not in cities:
+        print("Unknown city. Try again")
         continue
 
     cities.remove(user_say)
     cache.add(user_say)
 
-    for c in user_say[::-1]:
-        if c in wrong_char:
+    for char in user_say[::-1]:
+        if char in wrong_char:
             continue
         else:
             break
@@ -37,7 +47,7 @@ while True:
         raise RuntimeError
 
     for city in cities:
-        if city.startswith(c):
+        if city.startswith(char):
             break
     else:
         raise Exception("user win")
@@ -45,3 +55,11 @@ while True:
     cities.remove(city)
     cache.add(city)
     print(city)
+
+    for char in city[::-1]:
+        if char in wrong_char:
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError
